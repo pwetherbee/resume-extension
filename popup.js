@@ -18,3 +18,10 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   });
 });
+
+chrome.storage.onChanged.addListener(function (changes, namespace) {
+  if (namespace === "local" && changes.message) {
+    var newMessage = changes.message.newValue;
+    document.getElementById("generated-resume-text").textContent = newMessage;
+  }
+});

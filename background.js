@@ -31,15 +31,14 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
 
 chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
   if (request.executeAIGen) {
-    executeAIGen(request.jobDescription).then(() => {
+    executeAIGen(request.jobDescription, sender).then(() => {
       console.log("done");
     });
   }
 });
 
-async function executeAIGen(jobDescription) {
+async function executeAIGen(jobDescription, sender) {
   try {
-    console.log("loading");
     const res = await fetch("http://localhost:3001/api/edit-default-resume", {
       method: "POST",
       headers: {
@@ -49,15 +48,17 @@ async function executeAIGen(jobDescription) {
         jobDescription,
       }),
     });
-    console.log(res);
     const data = await res.json();
     console.log(data);
     // execute script that sets the text area to the data
     chrome.scripting.executeScript({
       target: { tabId: sender.tab.id },
-      func: function () {
-        document.getElementById("generated-resume-text").textContent = data;
+      func: function (data) {
+        chrome.storage.local.set({ message: data.message });
+        document.getElementById("generated-resume-text").textContent =
+          data.message;
       },
+      args: [data],
     });
   } catch (error) {
     console.log(error);
