@@ -6,6 +6,13 @@ document.addEventListener("DOMContentLoaded", function () {
         target: { tabId: tabs[0].id },
         func: function () {
           console.log(document.getElementById("job-details").textContent);
+          if (document.getElementById("job-details").textContent) {
+            chrome.runtime.sendMessage({
+              executeAIGen: true,
+              jobDescription:
+                document.getElementById("job-details").textContent,
+            });
+          }
         },
       });
     });
